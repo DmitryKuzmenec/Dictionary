@@ -1,0 +1,32 @@
+.loginForm {
+    background-color: gray;
+    padding: 10px;
+    margin: 50px;
+}
+
+.Error {
+    background-color: red;
+    font-style: italic;
+    font-weight: bold;
+    padding: 10px;
+    width: 100%;
+}
+
+.loginFormUser{
+    width: 200px;
+    margin-bottom: 5px;
+}
+
+.loginFormPasswd{
+    width: 200px;
+    margin-bottom: 10px;
+}
+
+.loginFormButton{
+    
+}
+
+.loginFormAnchor {
+    cursor: pointer;
+    color: blue;
+}

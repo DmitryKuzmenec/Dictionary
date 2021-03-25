@@ -1,31 +1,47 @@
 package main
 
 import (
-	"context"
-	"log"
-	"net/http"
-
-	"github.com/DmitryKuzmenec/dictionary/controller"
+	"github.com/DmitryKuzmenec/dictionary/controllers"
 	"github.com/DmitryKuzmenec/dictionary/model"
+	"github.com/DmitryKuzmenec/dictionary/repositories"
+	"github.com/DmitryKuzmenec/dictionary/services"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	db, err := gorm.Open("sqlite3", "/var/tmp/dictionary.go")
 	if err != nil {
 		panic("failed to connect database")
 	}
 	defer db.Close()
-	db.AutoMigrate(&model.Dictionary{})
+	db.AutoMigrate(
+		&model.DictionaryDB{},
+		&model.UsersDB{},
+		&model.GroupsDB{},
+	)
 
-	http.HandleFunc("/translate", controller.Translate(ctx))
+	repoDictionary := repositories.NewDictionaryRepository(db)
+	serviceDictionary := services.NewDictionaryService(repoDictionary)
+	controllerDictionary := controllers.NewDictionaryController(serviceDictionary)
 
-	err = http.ListenAndServe("localhost:8090", nil)
-	if err != nil {
-		log.Fatal(err)
-	}
+	repoUser := repositories.NewUsersRepository(db)
+	serviceUser := services.NewUserService(repoUser)
+	controllerUser := controllers.NewUsersController(serviceUser)
+
+	e := echo.New()
+	e.Static("/", "frontend/dictionary/build/")
+	e.Static("/public", "frontend/public/")
+
+	d := e.Group("/dictionary")
+	d.GET("/dump", controllerDictionary.Dump)
+	d.POST("/add", controllerDictionary.Add)
+
+	u := e.Group("/user")
+	u.POST("/signup", controllerUser.Signup)
+	u.POST("/signin", controllerUser.Signin)
+
+	e.Logger.Fatal(e.Start("localhost:8090"))
 }

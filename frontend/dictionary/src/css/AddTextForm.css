@@ -1,0 +1,19 @@
+.inputForm {
+    background-color: gray;
+    padding: 10px;
+}
+.inputText {
+    width: 600px;
+    margin-bottom: 10px;
+}
+.inputTranslation {
+    width: 600px;
+    margin-bottom: 10px;
+}
+.inputTranscription {
+    width: 600px;
+    margin-bottom: 30px;
+}
+.addButton {
+
+}

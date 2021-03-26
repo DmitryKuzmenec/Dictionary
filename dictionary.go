@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/DmitryKuzmenec/dictionary/controllers"
+	"github.com/DmitryKuzmenec/dictionary/middleware"
 	"github.com/DmitryKuzmenec/dictionary/model"
 	"github.com/DmitryKuzmenec/dictionary/repositories"
 	"github.com/DmitryKuzmenec/dictionary/services"
@@ -42,6 +43,7 @@ func main() {
 	u := e.Group("/user")
 	u.POST("/signup", controllerUser.Signup)
 	u.POST("/signin", controllerUser.Signin)
+	u.GET("/jwt", controllerUser.CheckJWT, middleware.JWTAuth) //for test JWT only
 
 	e.Logger.Fatal(e.Start("localhost:8090"))
 }

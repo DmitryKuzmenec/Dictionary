@@ -1,4 +1,5 @@
 import React, {useState} from "react"
+import {useHistory, useLocation} from "react-router-dom"
 import '../css/Signup.css'
 
 
@@ -9,17 +10,20 @@ export default function Signup() {
     const [passwd2, setPasswd2] = useState('');
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
+    const [moveTo, setMoveTo] = useState('');
+    
+    const history = useHistory();
+    const location = useLocation();
 
+    const {from} = location.state || {from: {pathname: '/'}};
+    
     const showError = err => {
         setError(<div className='Error'>ERROR: {err}</div>);
     }
-    const hideError = () => {
-        setError('');
-    }
 
-    const doSignup = async () => {
+    const doSignup = () => {
         try {
-            await fetch("/user/signup",{
+            fetch("/user/signup",{
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -42,9 +46,8 @@ export default function Signup() {
                 if (data.error && data.error !== "") {
                     throw new Error(data.error);
                 }
-                hideError();
-                setPasswd1('');
-                setPasswd2('');
+                console.log("Replace to: ",from );
+                toLogin();
             })
         }
         catch(error) {
@@ -52,8 +55,17 @@ export default function Signup() {
         };
     }
 
+    const toLogin = () => {
+        console.log("Before login: ", from);
+        setMoveTo(<Redirect to={{
+            pathname: "/login",
+            state:  { from: location.pathname },
+        }}/>);
+    }
+
     return(
         <>
+        {moveTo}
         {error}
         <div className='SignupForm'>
             <input 

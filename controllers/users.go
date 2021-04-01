@@ -68,5 +68,5 @@ func (c *ControllerUsers) Signin(ctx echo.Context) error {
 func (c *ControllerUsers) CheckJWT(ctx echo.Context) error {
 	user := ctx.Get("user")
 	spew.Dump("MyUser", user)
-	return ctx.String(http.StatusOK, "OK")
+	return ctx.JSON(http.StatusOK, user)
 }

@@ -1,19 +1,20 @@
 import React, {useState} from "react"
-import {Redirect} from "react-router-dom"
+import {Redirect, useHistory, useLocation} from "react-router-dom"
 import "../css/Login.css"
 
 export default function Login(props) {
-    let next = props.next;
     const [email, setEmail] = useState('');
     const [passwd, setPasswd] = useState('');
     const [error, setError] = useState('');
-    const [signup, setSignup] = useState('');
+    const [moveTo, setMoveTo] = useState('');
 
+    let history = useHistory();
+    let location = useLocation();
+    
+    let {from} = location.state || {from: {pathname: '/'}}
+    
     const showError = err => {
         setError(<div className='Error'>ERROR: {err}</div>);
-    }
-    const hideError = () => {
-        setError('');
     }
 
     const doLogin = async () => {
@@ -39,8 +40,7 @@ export default function Login(props) {
                 if (data.error && data.error !== "") {
                     throw new Error(data.error);
                 }
-                hideError();
-                setPasswd('');
+                history.replace(from);
             })
         }
         catch(error) {
@@ -49,23 +49,27 @@ export default function Login(props) {
     };
 
     const toSignup = () => {
-        setSignup(<Redirect to='/signup'/>);
+        console.log("Before signup: ", from);
+        setMoveTo(<Redirect to={{
+            pathname: "/signup",
+            state:  { from: location.pathname },
+        }}/>);
     }
-
+    
     return(
         <>
-        {signup}
-        {error}
-        <div className='loginForm'>
-            <input type="text" className='loginFormUser' 
-            value={email} placeholder="Электронная почта" onChange={e => setEmail(e.target.value)}
-        /><br/>
-            <input type="text" className='loginFormPasswd' 
-            value={passwd} placeholder="Пароль" onChange={e => setPasswd(e.target.value)}
-        /><br/>
-            <button className='loginFormButton' onClick={doLogin}>Войти</button>
-        </div>
-        <span className='loginFormAnchor' onClick={toSignup}>Зарегистрироваться</span>
+            {moveTo}
+            {error}
+            <div className='loginForm'>
+                <input type="text" className='loginFormUser' 
+                value={email} placeholder="Электронная почта" onChange={e => setEmail(e.target.value)}
+            /><br/>
+                <input type="text" className='loginFormPasswd' 
+                value={passwd} placeholder="Пароль" onChange={e => setPasswd(e.target.value)}
+            /><br/>
+                <button className='loginFormButton' onClick={doLogin}>Войти</button>
+            </div>
+            <span className='loginFormAnchor' onClick={toSignup}>Зарегистрироваться</span>
         </>
     )
 }

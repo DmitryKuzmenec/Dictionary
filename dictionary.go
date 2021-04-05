@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/DmitryKuzmenec/dictionary/controllers"
 	"github.com/DmitryKuzmenec/dictionary/middleware"
 	"github.com/DmitryKuzmenec/dictionary/model"
@@ -13,9 +15,9 @@ import (
 
 func main() {
 
-	db, err := gorm.Open("sqlite3", "/var/tmp/dictionary.go")
+	db, err := gorm.Open("sqlite3", "./dictionary.db")
 	if err != nil {
-		panic("failed to connect database")
+		panic(fmt.Sprintf("failed to connect database: %s", err))
 	}
 	defer db.Close()
 	db.AutoMigrate(
@@ -45,5 +47,5 @@ func main() {
 	u.POST("/signin", controllerUser.Signin)
 	u.GET("/jwt", controllerUser.CheckJWT, middleware.JWTAuth) //for test JWT only
 
-	e.Logger.Fatal(e.Start("localhost:8090"))
+	e.Logger.Fatal(e.Start(":8090"))
 }

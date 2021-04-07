@@ -1,12 +1,11 @@
 import React, {useState} from "react"
 import {Redirect, useHistory, useLocation} from "react-router-dom"
-import "../css/Login.css"
+import "../css/Signin.css"
 
-export default function Login(props) {
+export default function Signin(props) {
     const [email, setEmail] = useState('');
     const [passwd, setPasswd] = useState('');
     const [error, setError] = useState('');
-    const [moveTo, setMoveTo] = useState('');
 
     let history = useHistory();
     let location = useLocation();
@@ -17,7 +16,7 @@ export default function Login(props) {
         setError(<div className='Error'>ERROR: {err}</div>);
     }
 
-    const doLogin = async () => {
+    const doSignin = async () => {
         try {
             await fetch("/user/signin",{
                 method: 'POST',
@@ -49,16 +48,11 @@ export default function Login(props) {
     };
 
     const toSignup = () => {
-        console.log("Before signup: ", from);
-        setMoveTo(<Redirect to={{
-            pathname: "/signup",
-            state:  { from: location.pathname },
-        }}/>);
+        history.push('/signup');
     }
     
     return(
         <>
-            {moveTo}
             {error}
             <div className='loginForm'>
                 <input type="text" className='loginFormUser' 
@@ -67,7 +61,7 @@ export default function Login(props) {
                 <input type="text" className='loginFormPasswd' 
                 value={passwd} placeholder="Пароль" onChange={e => setPasswd(e.target.value)}
             /><br/>
-                <button className='loginFormButton' onClick={doLogin}>Войти</button>
+                <button className='loginFormButton' onClick={doSignin}>Войти</button>
             </div>
             <span className='loginFormAnchor' onClick={toSignup}>Зарегистрироваться</span>
         </>

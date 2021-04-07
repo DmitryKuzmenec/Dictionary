@@ -6,7 +6,6 @@ import (
 
 	"github.com/DmitryKuzmenec/dictionary/model"
 	"github.com/DmitryKuzmenec/dictionary/utils"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo/v4"
 )
 
@@ -61,12 +60,12 @@ func (c *ControllerUsers) Signin(ctx echo.Context) error {
 	cookie.Name = "token"
 	cookie.Value = token
 	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.Path = "/"
 	ctx.SetCookie(cookie)
 	return ctx.JSON(http.StatusOK, &model.ErrorRes{Status: "ok"})
 }
 
 func (c *ControllerUsers) CheckJWT(ctx echo.Context) error {
 	user := ctx.Get("user")
-	spew.Dump("MyUser", user)
 	return ctx.JSON(http.StatusOK, user)
 }

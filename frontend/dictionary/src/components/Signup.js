@@ -47,7 +47,7 @@ export default function Signup() {
                     throw new Error(data.error);
                 }
                 console.log("Replace to: ",from );
-                toLogin();
+                toSignin();
             })
         }
         catch(error) {
@@ -55,12 +55,8 @@ export default function Signup() {
         };
     }
 
-    const toLogin = () => {
-        console.log("Before login: ", from);
-        setMoveTo(<Redirect to={{
-            pathname: "/login",
-            state:  { from: location.pathname },
-        }}/>);
+    const toSignin = () => {
+        history.push('/signin');
     }
 
     return(

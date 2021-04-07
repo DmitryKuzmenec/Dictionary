@@ -39,8 +39,11 @@ func main() {
 	e.Static("/public", "frontend/public/")
 
 	d := e.Group("/dictionary")
+	d.Use(middleware.JWTAuth)
 	d.GET("/dump", controllerDictionary.Dump)
 	d.POST("/add", controllerDictionary.Add)
+	d.POST("/groups/create", controllerDictionary.CreateGroup)
+	d.GET("/groups/list/:userid", controllerDictionary.ListGroups)
 
 	u := e.Group("/user")
 	u.POST("/signup", controllerUser.Signup)

@@ -1,11 +1,11 @@
 import React from 'react'
 import NavBar from './NavBar'
 
-export default function Home() {
+export default function Exam() {
     return (
         <>
-            <NavBar page='Главная'/>
-            Home
+        <NavBar page='Экзамен'/>
+        EXAM
         </>
     )
 }

@@ -14,6 +14,14 @@ func NewDictionaryService(repo RepositoryDictionaryInterface) *ServiceDictionary
 	}
 }
 
+func (s *ServiceDictionary) CreateGroup(userID uint, name string) error {
+	return s.repo.CreateGroup(userID, name)
+}
+
+func (s *ServiceDictionary) GetGroups(userID uint) (interface{}, error) {
+	return s.repo.GetGroups(userID)
+}
+
 func (s *ServiceDictionary) Add(data model.DictionaryAddReq) error {
 	return s.repo.Add(data)
 }

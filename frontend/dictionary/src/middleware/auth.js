@@ -18,7 +18,7 @@ export default function Auth(props) {
             if(mounted) {
                 if (! response.ok) {
                     setNext(<Redirect to={{
-                        pathname: "/login",
+                        pathname: "/signin",
                         state: { from: location.pathname }
                     }}/>)
                 } else {

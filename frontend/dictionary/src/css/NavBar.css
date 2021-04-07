@@ -1,0 +1,39 @@
+nav {
+    display: flex;
+    flex-direction: row;
+    background-color: #282c34;
+    color: white;
+    height: 70px;
+    align-items: center;
+  }
+  
+  .navLogo {
+    width: 10%;
+  }
+  
+  .navMenu {
+    width: 65%;
+  }
+  
+  .navMenuItem {
+    margin-right: 10px;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+
+  .navMenuItemSelected {
+    margin-right: 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .navInfo {
+    width: 10%;
+    font-weight: bold;
+  }
+  
+  .navLogout {
+    width: 5%;
+    cursor: pointer;
+  }

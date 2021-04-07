@@ -4,23 +4,34 @@ import { HashRouter } from "react-router-dom"
 import {createBrowserHistory} from 'history'
 import {createStore} from 'redux'
 import {Provider} from 'react-redux'
-
-import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import Reducer from './reducers/index'
 import {Increment} from './actions'
 
+// Material UI
+import CssBaseline from '@material-ui/core/CssBaseline';
+import { ThemeProvider } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+import Theme from './StylesMU'
+
+//import 'fontsource-roboto';
+import './index.css';
+
 const history = createBrowserHistory();
 const store = createStore(Reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
-store.dispatch(Increment());
-store.dispatch(Increment());
+const theme = Theme(); 
 
 ReactDOM.render(
   <React.StrictMode>
     <HashRouter history={history}>
       <Provider store={store}>
-        <App />
+        <CssBaseline />
+          <ThemeProvider theme={theme}>
+            <Container maxWidth="lg" style={{ backgroundColor: ' #f7f7f7 ', height: '100vh' }} >
+              <App />
+            </Container>
+          </ThemeProvider>
       </Provider>
     </HashRouter>
   </React.StrictMode>,

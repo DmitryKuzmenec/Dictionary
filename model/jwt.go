@@ -5,10 +5,11 @@ import (
 )
 
 type DataJWT struct {
+	UserID    uint   `json:"id"`
+	Role      uint   `json:"role"`
+	Time      uint   `json:"time"`
 	Email     string `json:"email"`
 	FirstName string `json:"fName"`
 	LastName  string `json:"lName"`
-	Role      uint   `json:"role"`
-	Time      uint   `json:"time"`
 	jwt.StandardClaims
 }

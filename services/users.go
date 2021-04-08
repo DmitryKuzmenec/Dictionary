@@ -43,6 +43,7 @@ func (s *ServiceUsers) Verify(u model.UserSignin) (*model.DataJWT, error) {
 		return nil, errors.New("wrong password")
 	}
 	jwt := model.DataJWT{
+		UserID:    user.ID,
 		Email:     user.Email,
 		FirstName: user.FirstName,
 		LastName:  user.LastName,

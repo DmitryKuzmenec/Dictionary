@@ -1,30 +1,40 @@
 package model
 
 type DictionaryDB struct {
-	ID            uint   `sql:"size:10;primaryKey;autoIncrement;"`
-	UserID        uint   `sql:"size:10;index;"`
-	GroupID       uint   `sql:"size:10;index;"`
-	Score         uint   `sql:"size:1024;"`
-	Date          uint   `sql:"size:1024;"`
-	Word          string `sql:"size:1024;"`
-	Transcription string `sql:"size:1024;"`
-	Translate     string `sql:"size:1024;"`
-	Done          bool   `sql:"size:1024;"`
-}
-type UsersDB struct {
-	ID        uint   `sql:"size:10;primaryKey;autoIncrement;"`
-	Role      uint   `sql:"size:10;"`
-	FirstName string `sql:"size:50;"`
-	LastName  string `sql:"size:50;"`
-	Email     string `sql:"size:100;index;unique"`
-	Password  string `sql:"size:256;"`
+	ID            uint   `gorm:"size:10;column:id;primaryKey;autoIncrement;"`
+	Date          uint   `gorm:"size:1024;column:date"`
+	Word          string `gorm:"size:1024;column:word"`
+	Transcription string `gorm:"size:1024;column:transcription"`
+	Translation   string `gorm:"size:1024;column:translate"`
+	Done          bool   `gorm:"size:1024;column:done"`
 }
 
-type GroupsDB struct {
-	ID     uint   `sql:"size:10;primaryKey;autoIncrement;"`
-	UserID uint   `sql:"size:10;uniqueIndex:user_name;"`
-	Total  uint   `sql:"size:10;"`
-	Status uint   `sql:"size:10;"`
-	Done   uint   `sql:"size:10;"`
-	Name   string `sql:"size:50;uniqueIndex:user_name;"`
+func (DictionaryDB) TableName() string {
+	return "dictionary_db"
+}
+
+type UsersDB struct {
+	ID        uint   `gorm:"size:10;column:id;primaryKey;autoIncrement;"`
+	Role      uint   `gorm:"size:10;column:role"`
+	FirstName string `gorm:"size:50;column:first_name"`
+	LastName  string `gorm:"size:50;column:last_name"`
+	Email     string `gorm:"size:100;column:email;index;unique"`
+	Password  string `gorm:"size:256;column:password"`
+}
+
+func (UsersDB) TableName() string {
+	return "users_db"
+}
+
+type DictionariesDB struct {
+	ID     uint   `gorm:"size:10;column:id;primaryKey;autoIncrement;"`
+	UserID uint   `gorm:"size:10;column:user_id;uniqueIndex:user_id;"`
+	Total  uint   `gorm:"size:10;column:total"`
+	Status uint   `gorm:"size:10;column:status"`
+	Done   uint   `gorm:"size:10;column:done"`
+	Name   string `gorm:"size:50;column:name;uniqueIndex:user_id;"`
+}
+
+func (DictionariesDB) TableName() string {
+	return "dictionaries_db"
 }

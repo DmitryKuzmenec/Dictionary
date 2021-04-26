@@ -3,9 +3,13 @@ package services
 import "github.com/DmitryKuzmenec/dictionary/model"
 
 type RepositoryDictionaryInterface interface {
-	CreateGroup(userID uint, name string) error
-	GetGroups(userID uint) ([]model.DictionaryGroup, error)
-	Add(data model.DictionaryAddReq) error
+	CreateDictionary(userID uint, name string) (*model.DictionariesDB, error)
+	RemoveDictionary(userID, dictionaryID uint) error
+	GetDictionary(userID, dictionaryID uint) (*model.DictionariesDB, error)
+	ListDictionaries(userID uint) ([]model.Dictionary, error)
+	WordAdd(data model.WordAdd, userID, dictionaryID uint) error
+	RemoveWord(userID, dictionaryID, wordID uint) error
+	GetWords(userID, dictionaryID uint) ([]model.DictionaryDB, error)
 	Dump() (interface{}, error)
 }
 

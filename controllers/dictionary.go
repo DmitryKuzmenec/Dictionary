@@ -18,48 +18,124 @@ func NewDictionaryController(service ServiceDictionaryInterface) *ControllerDict
 	}
 }
 
-func (c *ControllerDictionary) CreateGroup(ctx echo.Context) error {
+func (c *ControllerDictionary) CreateDictionary(ctx echo.Context) error {
 	req := model.DictionaryCreateGroupReq{}
 	if err := ctx.Bind(&req); err != nil {
 		return ctx.String(http.StatusBadRequest, err.Error())
 	}
-	if req.UserID == 0 {
-		return ctx.String(http.StatusBadRequest, "user unknown")
-	}
 	if req.Name == "" {
 		return ctx.String(http.StatusBadRequest, "name is empty")
 	}
-	if err := c.service.CreateGroup(req.UserID, req.Name); err != nil {
+
+	user, ok := ctx.Get("user").(*model.DataJWT)
+	if !ok {
+		return ctx.JSON(http.StatusInternalServerError, struct{ Error string }{"can't unpack user"})
+	}
+
+	dictionary, err := c.service.CreateDictionary(user.UserID, req.Name)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, struct{ Error string }{Error: err.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, dictionary)
+}
+
+func (c *ControllerDictionary) RemoveDictionary(ctx echo.Context) error {
+	dictionaryIDStr := ctx.Param("dictionaryID")
+	if dictionaryIDStr == "" {
+		return ctx.JSON(http.StatusBadRequest, struct{ Error string }{"wrong dictionaryID"})
+	}
+	dictionaryID, err := strconv.Atoi(dictionaryIDStr)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, struct{ Error string }{"wrong dictionaryID"})
+	}
+	user, ok := ctx.Get("user").(*model.DataJWT)
+	if !ok {
+		return ctx.JSON(http.StatusInternalServerError, struct{ Error string }{"can't unpack user"})
+	}
+
+	if err := c.service.RemoveDictionary(user.UserID, uint(dictionaryID)); err != nil {
 		return err
 	}
 	return ctx.JSON(http.StatusOK, struct{ Error string }{})
 }
 
-func (c *ControllerDictionary) ListGroups(ctx echo.Context) error {
-	userIDStr := ctx.Param("userid")
-	userID, err := strconv.Atoi(userIDStr)
-	if err != nil {
-		return ctx.String(http.StatusBadRequest, err.Error())
+func (c *ControllerDictionary) ListDictionaries(ctx echo.Context) error {
+	user, ok := ctx.Get("user").(*model.DataJWT)
+	if !ok {
+		return ctx.JSON(http.StatusInternalServerError, struct{ Error string }{"can't unpack user"})
 	}
-	if userID == 0 {
-		return ctx.String(http.StatusBadRequest, "user unknown")
-	}
-	groups, err := c.service.GetGroups(uint(userID))
+
+	groups, err := c.service.ListDictionaries(user.UserID)
 	if err != nil {
 		return ctx.String(http.StatusInternalServerError, err.Error())
 	}
 	return ctx.JSON(http.StatusOK, groups)
 }
 
-func (c *ControllerDictionary) Add(ctx echo.Context) error {
-	req := model.DictionaryAddReq{}
+func (c *ControllerDictionary) WordAdd(ctx echo.Context) error {
+	req := model.WordAddReq{}
 	if err := ctx.Bind(&req); err != nil {
 		return ctx.String(http.StatusBadRequest, err.Error())
 	}
-	if err := c.service.Add(req); err != nil {
+
+	user, ok := ctx.Get("user").(*model.DataJWT)
+	if !ok {
+		return ctx.JSON(http.StatusInternalServerError, struct{ Error string }{"can't unpack user"})
+	}
+
+	data := model.WordAdd{
+		Word:          req.Word,
+		Translation:   req.Translation,
+		Transcription: req.Transcription,
+	}
+
+	if err := c.service.WordAdd(data, user.UserID, req.DictionaryID); err != nil {
 		return err
 	}
+
 	return ctx.JSON(http.StatusOK, struct{ Error string }{})
+}
+
+func (c *ControllerDictionary) WordRemove(ctx echo.Context) error {
+	req := model.WordRemoveReq{}
+	if err := ctx.Bind(&req); err != nil {
+		return ctx.String(http.StatusBadRequest, err.Error())
+	}
+
+	user, ok := ctx.Get("user").(*model.DataJWT)
+	if !ok {
+		return ctx.JSON(http.StatusInternalServerError, struct{ Error string }{"can't unpack user"})
+	}
+	if user.UserID == 0 || req.DictionaryID == 0 || req.WordID == 0 {
+		return ctx.JSON(http.StatusBadRequest, struct{ Error string }{Error: "wrong input data"})
+	}
+
+	if err := c.service.WordRemove(user.UserID, req.DictionaryID, req.WordID); err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, struct{ Error string }{})
+}
+
+func (c *ControllerDictionary) GetDictionary(ctx echo.Context) error {
+	dictionaryIDStr := ctx.Param("dictionaryID")
+	dictionaryID, err := strconv.Atoi(dictionaryIDStr)
+
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, struct{ Error string }{Error: err.Error()})
+	}
+	user, ok := ctx.Get("user").(*model.DataJWT)
+	if !ok {
+		return ctx.JSON(http.StatusInternalServerError, struct{ Error string }{"can't unpack user"})
+	}
+
+	words, err := c.service.GetWords(user.UserID, uint(dictionaryID))
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, struct{ Error string }{Error: err.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, words)
 }
 
 func (c *ControllerDictionary) Dump(ctx echo.Context) error {
@@ -67,5 +143,6 @@ func (c *ControllerDictionary) Dump(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
+
 	return ctx.JSON(http.StatusOK, dump)
 }

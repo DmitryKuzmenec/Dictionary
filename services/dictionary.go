@@ -1,6 +1,9 @@
 package services
 
 import (
+	"errors"
+	"time"
+
 	"github.com/DmitryKuzmenec/dictionary/model"
 )
 
@@ -14,16 +17,63 @@ func NewDictionaryService(repo RepositoryDictionaryInterface) *ServiceDictionary
 	}
 }
 
-func (s *ServiceDictionary) CreateGroup(userID uint, name string) error {
-	return s.repo.CreateGroup(userID, name)
+func (s *ServiceDictionary) CreateDictionary(userID uint, name string) (*model.Dictionary, error) {
+	d, err := s.repo.CreateDictionary(userID, name)
+	if err != nil {
+		return nil, err
+	}
+	dictionary := model.Dictionary{
+		ID:     d.ID,
+		UserID: d.UserID,
+		Total:  d.Total,
+		Done:   d.Done,
+		Status: d.Status,
+		Name:   d.Name,
+	}
+	return &dictionary, nil
 }
 
-func (s *ServiceDictionary) GetGroups(userID uint) (interface{}, error) {
-	return s.repo.GetGroups(userID)
+func (s *ServiceDictionary) RemoveDictionary(userID, dictionaryID uint) error {
+	dictionary, err := s.repo.GetDictionary(userID, dictionaryID)
+	if err != nil {
+		return err
+	}
+	if dictionary == nil {
+		return errors.New("dictionary not exists")
+	}
+	return s.repo.RemoveDictionary(userID, dictionaryID)
 }
 
-func (s *ServiceDictionary) Add(data model.DictionaryAddReq) error {
-	return s.repo.Add(data)
+func (s *ServiceDictionary) ListDictionaries(userID uint) (interface{}, error) {
+	return s.repo.ListDictionaries(userID)
+}
+
+func (s *ServiceDictionary) WordAdd(data model.WordAdd, userID, dictionaryID uint) error {
+	return s.repo.WordAdd(data, userID, dictionaryID)
+}
+
+func (s *ServiceDictionary) WordRemove(userID, dictionaryID, wordID uint) error {
+	return s.repo.RemoveWord(userID, dictionaryID, wordID)
+}
+
+func (s *ServiceDictionary) GetWords(userID, dictionaryID uint) ([]model.Word, error) {
+	wordsDB, err := s.repo.GetWords(userID, dictionaryID)
+
+	if err != nil {
+		return nil, err
+	}
+	var words []model.Word
+	for _, w := range wordsDB {
+		words = append(words, model.Word{
+			ID:            w.ID,
+			Word:          w.Word,
+			Translation:   w.Translation,
+			Transcription: w.Transcription,
+			Done:          w.Done,
+			Date:          time.Unix(int64(w.Date), 0).Format("2006-01-02"),
+		})
+	}
+	return words, nil
 }
 
 func (s *ServiceDictionary) Dump() (interface{}, error) {

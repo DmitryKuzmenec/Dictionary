@@ -21,9 +21,8 @@ func main() {
 	}
 	defer db.Close()
 	db.AutoMigrate(
-		&model.DictionaryDB{},
 		&model.UsersDB{},
-		&model.GroupsDB{},
+		&model.DictionariesDB{},
 	)
 
 	repoDictionary := repositories.NewDictionaryRepository(db)
@@ -40,10 +39,13 @@ func main() {
 
 	d := e.Group("/dictionary")
 	d.Use(middleware.JWTAuth)
+	d.POST("/create", controllerDictionary.CreateDictionary)
+	d.DELETE("/remove/:dictionaryID", controllerDictionary.RemoveDictionary)
+	d.GET("/list", controllerDictionary.ListDictionaries)
 	d.GET("/dump", controllerDictionary.Dump)
-	d.POST("/add", controllerDictionary.Add)
-	d.POST("/groups/create", controllerDictionary.CreateGroup)
-	d.GET("/groups/list/:userid", controllerDictionary.ListGroups)
+	d.POST("/words", controllerDictionary.WordAdd)
+	d.DELETE("/words", controllerDictionary.WordRemove)
+	d.GET("/words/:dictionaryID", controllerDictionary.GetDictionary)
 
 	u := e.Group("/user")
 	u.POST("/signup", controllerUser.Signup)

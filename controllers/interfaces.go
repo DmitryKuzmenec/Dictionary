@@ -1,11 +1,16 @@
 package controllers
 
-import "github.com/DmitryKuzmenec/dictionary/model"
+import (
+	"github.com/DmitryKuzmenec/dictionary/model"
+)
 
 type ServiceDictionaryInterface interface {
-	CreateGroup(userID uint, name string) error
-	GetGroups(userID uint) (interface{}, error)
-	Add(data model.DictionaryAddReq) error
+	CreateDictionary(userID uint, name string) (*model.Dictionary, error)
+	RemoveDictionary(userID, dictionaryID uint) error
+	WordAdd(data model.WordAdd, userID, dictionaryID uint) error
+	WordRemove(userID, dictionaryID, wordID uint) error
+	GetWords(userID, dictionaryID uint) ([]model.Word, error)
+	ListDictionaries(userID uint) (interface{}, error)
 	Dump() (interface{}, error)
 }
 type ServiceTranslateInterface interface {

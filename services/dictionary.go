@@ -48,8 +48,28 @@ func (s *ServiceDictionary) ListDictionaries(userID uint) (interface{}, error) {
 	return s.repo.ListDictionaries(userID)
 }
 
-func (s *ServiceDictionary) WordAdd(data model.WordAdd, userID, dictionaryID uint) error {
-	return s.repo.WordAdd(data, userID, dictionaryID)
+func (s *ServiceDictionary) WordAdd(data model.WordAdd, userID, dictionaryID uint) (*model.Word, error) {
+	if data.Word == "" {
+		return nil, errors.New("word empty")
+	}
+	if data.Translation == "" {
+		return nil, errors.New("translation empty")
+	}
+	word, err := s.repo.WordAdd(data, userID, dictionaryID)
+	if err != nil {
+		return nil, err
+	}
+	var date string
+	timeCreated := time.Unix(int64(word.Date), 0)
+	date = timeCreated.Format("2006-01-02")
+	res := model.Word{
+		ID:            word.ID,
+		Date:          date,
+		Word:          word.Word,
+		Translation:   word.Translation,
+		Transcription: word.Transcription,
+	}
+	return &res, nil
 }
 
 func (s *ServiceDictionary) WordRemove(userID, dictionaryID, wordID uint) error {

@@ -7,7 +7,7 @@ type RepositoryDictionaryInterface interface {
 	RemoveDictionary(userID, dictionaryID uint) error
 	GetDictionary(userID, dictionaryID uint) (*model.DictionariesDB, error)
 	ListDictionaries(userID uint) ([]model.Dictionary, error)
-	WordAdd(data model.WordAdd, userID, dictionaryID uint) error
+	WordAdd(data model.WordAdd, userID, dictionaryID uint) (*model.DictionaryDB, error)
 	RemoveWord(userID, dictionaryID, wordID uint) error
 	GetWords(userID, dictionaryID uint) ([]model.DictionaryDB, error)
 	Dump() (interface{}, error)

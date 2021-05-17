@@ -39,6 +39,8 @@ export default function WordsList(props) {
     const remove = props.remove;
     const edit = props.edit;
 
+    console.log("Words: ",words);
+
     const classes = useStyles();
 
     const editWord = (e, word) => {

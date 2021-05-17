@@ -66,11 +66,11 @@ func (c *ControllerDictionary) ListDictionaries(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, struct{ Error string }{"can't unpack user"})
 	}
 
-	groups, err := c.service.ListDictionaries(user.UserID)
+	dictionaries, err := c.service.ListDictionaries(user.UserID)
 	if err != nil {
 		return ctx.String(http.StatusInternalServerError, err.Error())
 	}
-	return ctx.JSON(http.StatusOK, groups)
+	return ctx.JSON(http.StatusOK, dictionaries)
 }
 
 func (c *ControllerDictionary) WordAdd(ctx echo.Context) error {
@@ -90,11 +90,11 @@ func (c *ControllerDictionary) WordAdd(ctx echo.Context) error {
 		Transcription: req.Transcription,
 	}
 
-	if err := c.service.WordAdd(data, user.UserID, req.DictionaryID); err != nil {
-		return err
+	word, err := c.service.WordAdd(data, user.UserID, req.DictionaryID)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, struct{ Error string }{Error: err.Error()})
 	}
-
-	return ctx.JSON(http.StatusOK, struct{ Error string }{})
+	return ctx.JSON(http.StatusOK, word)
 }
 
 func (c *ControllerDictionary) WordRemove(ctx echo.Context) error {

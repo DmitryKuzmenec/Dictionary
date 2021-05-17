@@ -75,8 +75,8 @@ export default function DictionaryEdit() {
             transcription: trscr,
         };
 
-        try{ AddWord(newWord, dictionary.id).then(() => {
-              setWords(words.concat([newWord]));
+        try{ AddWord(newWord, dictionary.id).then((word) => {
+              setWords(words.concat([word]));
               setTotal(total + 1);
               setForeign('');
               setTranslate('');

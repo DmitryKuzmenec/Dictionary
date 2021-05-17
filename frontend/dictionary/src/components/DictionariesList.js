@@ -50,6 +50,8 @@ export default function DictionariesList() {
   const [openWarning, setOpenWarning] = useState(false);
   const [deleteDictionaryID, setDeleteDictionaryID] = useState(0);
 
+  console.log(dictionaries);
+
   useEffect(() => {
     try {
       GetDictionariesList().then((dictionaries) => {
@@ -63,11 +65,11 @@ export default function DictionariesList() {
     }
   }, [])
   
-  const changeGroupName = (e) => {
+  const changeDictionaryName = (e) => {
     setDictionaryName(e.target.value)
   }
   
-  const addNewGroup = () => {
+  const addNewDictionary = () => {
     try{
       CreateDictionary(dictionaryName).then((d) => {
         console.log(d);
@@ -108,8 +110,8 @@ export default function DictionariesList() {
     <React.Fragment>
       
       <Grid container direction="row" justify="flex-end" alignItems="flex-end">
-          <TextField id="standard-basic" label="Название нового словаря" className={classes.textField} value={dictionaryName} onChange={changeGroupName}/>
-          <Button variant="outlined" color="primary" onClick={addNewGroup}>Создать</Button>
+          <TextField id="standard-basic" label="Название нового словаря" className={classes.textField} value={dictionaryName} onChange={changeDictionaryName}/>
+          <Button variant="outlined" color="primary" onClick={addNewDictionary}>Создать</Button>
       </Grid>
       <br/>
       <TableContainer component={Paper}>

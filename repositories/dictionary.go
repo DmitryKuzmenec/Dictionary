@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/DmitryKuzmenec/dictionary/model"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/jinzhu/gorm"
 )
 
@@ -79,7 +78,7 @@ func (r *RepositoryDictionary) ListDictionaries(userID uint) ([]model.Dictionary
 	return groups, nil
 }
 
-func (r *RepositoryDictionary) WordAdd(data model.WordAdd, userID, dictionaryID uint) error {
+func (r *RepositoryDictionary) WordAdd(data model.WordAdd, userID, dictionaryID uint) (*model.DictionaryDB, error) {
 	tableName := dictionaryTableName(userID, dictionaryID)
 
 	r.db.Table(tableName).AutoMigrate(&model.DictionaryDB{})
@@ -91,10 +90,13 @@ func (r *RepositoryDictionary) WordAdd(data model.WordAdd, userID, dictionaryID 
 		Date:          uint(time.Now().Unix()),
 	}
 	if rez := r.db.Model(&model.DictionaryDB{}).Table(tableName).Create(&item); rez.Error != nil {
-		return rez.Error
+		return nil, rez.Error
 	}
 
-	return r.DictionaryWordsCounterInc(userID, dictionaryID)
+	if err := r.DictionaryWordsCounterInc(userID, dictionaryID); err != nil {
+		return nil, err
+	}
+	return &item, nil
 }
 
 func (r *RepositoryDictionary) RemoveWord(userID, dictionaryID, wordID uint) error {
@@ -123,7 +125,7 @@ func (r *RepositoryDictionary) DictionaryWordsCounterInc(userID, dictionaryID ui
 		return rez.Error
 	}
 	dictinary.Total += 1
-	if rez := r.db.Model(&model.DictionariesDB{}).Update(&dictinary); rez.Error != nil {
+	if rez := r.db.Model(&dictinary).Update("total", dictinary.Total); rez.Error != nil {
 		return rez.Error
 	}
 	return nil
@@ -136,12 +138,11 @@ func (r *RepositoryDictionary) DictionaryWordsCounterDecr(userID, dictionaryID u
 		First(&dictinary); rez.Error != nil {
 		return rez.Error
 	}
-	spew.Dump(dictinary.Total)
 	if dictinary.Total == 0 {
 		return nil
 	}
 	dictinary.Total -= 1
-	if rez := r.db.Model(&model.DictionariesDB{}).Update(&dictinary); rez.Error != nil {
+	if rez := r.db.Model(&dictinary).Update("total", dictinary.Total); rez.Error != nil {
 		return rez.Error
 	}
 	return nil

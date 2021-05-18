@@ -72,6 +72,29 @@ func (s *ServiceDictionary) WordAdd(data model.WordAdd, userID, dictionaryID uin
 	return &res, nil
 }
 
+func (s *ServiceDictionary) GetUnlearnedWords(userID, dictionaryID, limit uint) ([]model.Word, error) {
+	data, err := s.repo.GetUnlearnedWords(userID, dictionaryID, limit)
+	if err != nil {
+		return nil, err
+	}
+	var words []model.Word
+	for _, w := range data {
+		var date string
+		timeCreated := time.Unix(int64(w.Date), 0)
+		date = timeCreated.Format("2006-01-02")
+		word := model.Word{
+			ID:            w.ID,
+			Date:          date,
+			Word:          w.Word,
+			Translation:   w.Translation,
+			Transcription: w.Transcription,
+			Done:          w.Done,
+		}
+		words = append(words, word)
+	}
+	return words, nil
+}
+
 func (s *ServiceDictionary) WordRemove(userID, dictionaryID, wordID uint) error {
 	return s.repo.RemoveWord(userID, dictionaryID, wordID)
 }

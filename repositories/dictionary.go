@@ -156,6 +156,14 @@ func (r *RepositoryDictionary) GetWords(userID, dictionaryID uint) ([]model.Dict
 	return words, rez.Error
 }
 
+func (r *RepositoryDictionary) GetUnlearnedWords(userID, dictionaryID, limit uint) ([]model.DictionaryDB, error) {
+	tableName := dictionaryTableName(userID, dictionaryID)
+	var words []model.DictionaryDB
+	rez := r.db.Model(&model.DictionaryDB{}).Debug().Table(tableName).Where("done == 0").Limit(limit).Find(&words)
+
+	return words, rez.Error
+}
+
 func dictionaryTableName(userID, dictionaryID uint) string {
 	return fmt.Sprintf("%s_%d_%d", dictionaryTablePrefix, userID, dictionaryID)
 }

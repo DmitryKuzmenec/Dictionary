@@ -138,6 +138,34 @@ func (c *ControllerDictionary) GetDictionary(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, words)
 }
 
+func (c *ControllerDictionary) GetUnlearnedWords(ctx echo.Context) error {
+	dictionaryIDStr := ctx.Param("dictionaryID")
+	dictionaryID, err := strconv.Atoi(dictionaryIDStr)
+
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, struct{ Error string }{Error: err.Error()})
+	}
+
+	wordsLimitStr := ctx.Param("limit")
+	wordsLimit, err := strconv.Atoi(wordsLimitStr)
+
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, struct{ Error string }{Error: err.Error()})
+	}
+
+	user, ok := ctx.Get("user").(*model.DataJWT)
+	if !ok {
+		return ctx.JSON(http.StatusInternalServerError, struct{ Error string }{"can't unpack user"})
+	}
+
+	words, err := c.service.GetUnlearnedWords(user.UserID, uint(dictionaryID), uint(wordsLimit))
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, struct{ Error string }{Error: err.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, words)
+}
+
 func (c *ControllerDictionary) Dump(ctx echo.Context) error {
 	dump, err := c.service.Dump()
 	if err != nil {

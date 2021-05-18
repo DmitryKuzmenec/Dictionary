@@ -10,6 +10,7 @@ type ServiceDictionaryInterface interface {
 	WordAdd(data model.WordAdd, userID, dictionaryID uint) (*model.Word, error)
 	WordRemove(userID, dictionaryID, wordID uint) error
 	GetWords(userID, dictionaryID uint) ([]model.Word, error)
+	GetUnlearnedWords(userID, dictionaryID, limit uint) ([]model.Word, error)
 	ListDictionaries(userID uint) (interface{}, error)
 	Dump() (interface{}, error)
 }

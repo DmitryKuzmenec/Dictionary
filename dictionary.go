@@ -46,6 +46,7 @@ func main() {
 	d.POST("/words", controllerDictionary.WordAdd)
 	d.DELETE("/words", controllerDictionary.WordRemove)
 	d.GET("/words/:dictionaryID", controllerDictionary.GetDictionary)
+	d.GET("/words/unlearned/:dictionaryID/:limit", controllerDictionary.GetUnlearnedWords)
 
 	u := e.Group("/user")
 	u.POST("/signup", controllerUser.Signup)

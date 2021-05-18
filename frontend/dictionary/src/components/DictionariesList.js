@@ -12,13 +12,16 @@ import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
 import HighlightOffIcon from '@material-ui/icons/HighlightOff'
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
+import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import {useHistory} from 'react-router'
 import WarningDialog from './WarningDialog'
 import {getUser} from '../util/jwt'
-import {GetDictionariesList, RemoveDictionary, CreateDictionary} from '../util/dictionary'
+import {GetDictionariesList, RemoveDictionary, CreateDictionary, GetWordsUnlearned} from '../util/dictionary'
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 650,
   },
@@ -37,8 +40,12 @@ const useStyles = makeStyles({
     },
   removeDictionary: {
     cursor: 'pointer',
-  }
-});
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
+}));
 
 
 export default function DictionariesList() {
@@ -49,6 +56,7 @@ export default function DictionariesList() {
   const [dictionaryName, setDictionaryName] = useState('');
   const [openWarning, setOpenWarning] = useState(false);
   const [deleteDictionaryID, setDeleteDictionaryID] = useState(0);
+  const [backdrop, setBackdrop] = useState(false);
 
   console.log(dictionaries);
 
@@ -70,9 +78,11 @@ export default function DictionariesList() {
   }
   
   const addNewDictionary = () => {
+    setBackdrop(true);
     try{
-      CreateDictionary(dictionaryName).then((d) => {
-        console.log(d);
+      CreateDictionary(dictionaryName)
+      .then((d) => {
+        setInterval(() => {setBackdrop(false)}, 1500)
         const newDictionaries = dictionaries
         newDictionaries.push(d);
         setDictionaries(newDictionaries);
@@ -106,9 +116,24 @@ export default function DictionariesList() {
     })
   }
 
+  const learnDictionary = (e, dictionaryID) => {
+    setBackdrop(true);
+    try{
+      GetWordsUnlearned(dictionaryID).then((words) => {
+        setInterval(() => {setBackdrop(false)}, 1500)
+        history.push({
+          pathname: '/learning',
+          state: words
+        })
+      })
+    } catch (err) {
+      
+    }
+  }
+
   return (
     <React.Fragment>
-      
+      <Backdrop className={classes.backdrop} open={backdrop}><CircularProgress color="inherit"/></Backdrop>
       <Grid container direction="row" justify="flex-end" alignItems="flex-end">
           <TextField id="standard-basic" label="Название нового словаря" className={classes.textField} value={dictionaryName} onChange={changeDictionaryName}/>
           <Button variant="outlined" color="primary" onClick={addNewDictionary}>Создать</Button>
@@ -122,6 +147,7 @@ export default function DictionariesList() {
             <TableCell align="right">Статус</TableCell>
             <TableCell align="right">Количество слов</TableCell>
             <TableCell align="right">Выучено</TableCell>
+            <TableCell align="center">Учить</TableCell>
             <TableCell align="center">Редактировать</TableCell>
             <TableCell align="center">Удалить</TableCell>
           </TableRow>
@@ -134,6 +160,11 @@ export default function DictionariesList() {
                     <TableCell align="right">{dictionary.status}</TableCell>
                     <TableCell align="right">{dictionary.total}</TableCell>
                     <TableCell align="right">{dictionary.done}</TableCell>
+                    <TableCell align="center">
+                      <div onClick={(e) => learnDictionary(e, dictionary.id)}>
+                        <LocalLibraryIcon className={classes.removeDictionary} color="primary"/>
+                      </div>
+                    </TableCell>
                     <TableCell align="center">
                       <div onClick={(e) => editDictionary(e, dictionary)}>
                         <PlaylistAddIcon className={classes.removeDictionary} color="secondary"/>

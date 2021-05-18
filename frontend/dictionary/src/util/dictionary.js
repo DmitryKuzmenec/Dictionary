@@ -103,3 +103,17 @@ export function GetWords(dictionaryID, page) {
   })
 }
 
+export function GetWordsUnlearned (dictionaryID) {
+  return fetch(`/dictionary/words/unlearned/${dictionaryID}/10`,{
+    method: 'GET',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+    },
+  }).then((response) => {
+    if (! response.ok) {
+      throw new Error(response.status +' - '+ response.statusText);
+    }
+    return response.json();
+  })
+}
